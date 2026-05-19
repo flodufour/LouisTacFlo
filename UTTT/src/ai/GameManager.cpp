@@ -29,7 +29,7 @@ GameManager::GameManager(long long runTimestamp)
 
     _minimaxStrategy = std::make_unique<MinimaxStrategy>(_evaluator.get(), _lightEvaluator.get(), 15);
 
-    _mCTSStrategy = std::make_unique<MCTSStrategy>(_lightEvaluator.get(),1.414, 3800);
+    _mCTSStrategy = std::make_unique<MCTSStrategy>(_evaluator.get(),1.414, 3800);
  }
 
 void GameManager::init(CellState mySide)
@@ -107,7 +107,12 @@ void GameManager::applyMove(const AIMove& move)
 
 AIMove GameManager::chooseMove()
 {
-    return _mCTSStrategy->chooseMove(_state);
+    int movesLeft = _state.getBoard().getMovesLeftBoard();
+    if(movesLeft > 15){
+            std::cout << movesLeft;
+        return _mCTSStrategy->chooseMove(_state);
+    }
+    return _minimaxStrategy->chooseMove(_state);
 }
 
 

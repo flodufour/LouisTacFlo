@@ -83,6 +83,10 @@ void SubBoard::undoMove(int index)
 
 int SubBoard::getMovesLetftSubBoard() const{
 
+    if(!isPlayable()){
+        return 0;
+    }
+
     int count = 0;
 
     for (int i = 0; i < 9; i ++){
@@ -90,6 +94,8 @@ int SubBoard::getMovesLetftSubBoard() const{
         if(_cells[i].getState() == CellState::EMPTY){
             count++;
         }
-        return count;
+
     }
+
+    return count;
 }
