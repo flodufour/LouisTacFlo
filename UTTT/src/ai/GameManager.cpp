@@ -30,7 +30,7 @@ GameManager::GameManager(long long runTimestamp)
 
     _mctsEvaluator = std::make_unique<MCTSFeatureEvaluator>();
 
-    _mCTSStrategy = std::make_unique<MCTSStrategy>(_mctsEvaluator.get(),0.3, 4000);
+    _mCTSStrategy = std::make_unique<MCTSStrategy>(_mctsEvaluator.get(),0.5, 4000);
 
     _minimaxStrategy = std::make_unique<MinimaxStrategy>(_evaluator.get(), _lightEvaluator.get(), 15);
 

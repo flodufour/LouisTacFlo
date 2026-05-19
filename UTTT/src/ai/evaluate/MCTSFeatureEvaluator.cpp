@@ -263,7 +263,7 @@ void MCTSFeatureEvaluator::extractMetaImportance(const UltimateBoard& b, int boa
         if (!containsBoard)
             continue;
 
-        int myCount = 0; int oppCount = 0;
+        int myCount = 0; int oppCount = 0; int emptyCount = 0;
         for (int idx : line)
         {
             if (idx == boardIndex)
@@ -272,11 +272,12 @@ void MCTSFeatureEvaluator::extractMetaImportance(const UltimateBoard& b, int boa
             CellState owner = b.getBoard(idx).checkWinner();
             if (owner == me)       myCount++;
             else if (owner == opp) oppCount++;
+            else                   emptyCount++;
         }
-        if (myCount == 1)  f.metaImportanceGood++;
-        if (myCount == 0)  f.metaImportanceBad++;
-        if (myCount == 2)  f.metaImportanceBad++;
-        if (oppCount == 2) f.metaImportanceBad++;
+        if(emptyCount == 3) f.metaImportanceGood ++;
+        if (myCount == 1 && oppCount == 1)       f.metaImportanceVeryGood++;
+        if (oppCount == 2 && emptyCount == 1)      f.metaImportanceVeryBad++;
+        if (oppCount == 1 && emptyCount == 2)      f.metaImportanceBad++;
     }
 }
 
@@ -309,7 +310,9 @@ int MCTSFeatureEvaluator::dot(const Features& f) const
 
     score += f.freeMove * w.freeMove;
     score += f.metaImportanceGood * w.metaImportanceGood;
+    score += f.metaImportanceVeryGood * w.metaImportanceVeryGood;
     score += f.metaImportanceBad * w.metaImportanceBad;
+    score += f.metaImportanceVeryBad * w.metaImportanceVeryBad;
     score += f.boardPositionBonus * w.boardPositionBonus;
     score += f.metaNearWin * w.metaNearWin;
     score += f.metaOpponentNearWin * w.metaOpponentNearWin;

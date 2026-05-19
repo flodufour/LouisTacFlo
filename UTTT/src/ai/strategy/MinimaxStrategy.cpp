@@ -16,6 +16,7 @@ MinimaxStrategy::MinimaxStrategy(IEvaluator* evaluator, IEvaluator* evaluatorLig
 
 AIMove MinimaxStrategy::chooseMove(GameState& state) {
 
+    std::fill(_transpositionTable.begin(), _transpositionTable.end(), TTEntry{});
     auto start = std::chrono::high_resolution_clock::now();
     AIMove globalBestMove;
 

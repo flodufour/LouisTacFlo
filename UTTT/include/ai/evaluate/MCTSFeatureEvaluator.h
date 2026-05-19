@@ -51,7 +51,9 @@ private:
         int freeMove = 0;
 
         int metaImportanceGood = 0;
+        int metaImportanceVeryGood = 0;
         int metaImportanceBad = 0;
+        int metaImportanceVeryBad = 0;
 
         int boardPositionBonus = 0;
 
@@ -85,7 +87,9 @@ private:
         int forcedVeryBad;
         int freeMove;
         int metaImportanceGood;
+        int metaImportanceVeryGood;
         int metaImportanceBad;
+        int metaImportanceVeryBad;
         int boardPositionBonus;
         int metaNearWin;
         int metaOpponentNearWin;
@@ -106,10 +110,11 @@ private:
         120,                // forcedDefensive
        -120,
        -180,                // forcedDanger
-       -70,                 // Free move
-        500,      -500,     // Meta importance pressure
+       -700,                 // Free move
+        300,      600,     // Meta importance pressure
+        -300,      -600,
         1,                  // Multiplicateur pour boardPositionBonus
-        600,      -600      // Meta Near Win
+        300,      -300      // Meta Near Win
     };
 
     static constexpr int boardWeight[9] = {
