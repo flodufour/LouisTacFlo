@@ -9,7 +9,7 @@ public:
     MCTSFeatureEvaluator();
     virtual ~MCTSFeatureEvaluator() override = default;
 
-    // Interface IEvaluator standard (utilisée par défaut)
+    // Interface IEvaluator standard (évalue selon le joueur du tour actuel)
     virtual int evaluate(const GameState& state) const override;
 
     // Surcharge spécifique MCTS appelée par MCTSStrategy
@@ -43,10 +43,10 @@ private:
         int subFork = 0;
         int subOpponentFork = 0;
 
-        // Features de la case forcée (dynamiquement incrémentées / décrémentées)
-        int forcedOffensive = 0;
-        int forcedDefensive = 0;
-        int forcedDanger = 0;
+        int forcedGood = 0;
+        int forcedVeryGood = 0;
+        int forcedBad = 0;
+        int forcedVeryBad = 0;
 
         int freeMove = 0;
 
@@ -79,9 +79,10 @@ private:
         int subOpponentOneInRow;
         int subFork;
         int subOpponentFork;
-        int forcedOffensive;
-        int forcedDefensive;
-        int forcedDanger;
+        int forcedGood;
+        int forcedVeryGood;
+        int forcedBad;
+        int forcedVeryBad;
         int freeMove;
         int metaImportanceGood;
         int metaImportanceBad;
@@ -90,7 +91,7 @@ private:
         int metaOpponentNearWin;
     };
 
-    // Grille de poids miroirs (Zero-Sum) calibrée pour l'IA racine
+    // Tes poids originaux stricts conservés
     static constexpr Weights w{
         1000000,  -1000000, // Terminal (Win / Loss)
         1200,     -1200,    // Meta ownership
@@ -101,10 +102,11 @@ private:
         120,       20,      // Sub-board threats
        -120,      -20,      // Sub-board opponent threats
         250,      -250,     // Sub forks
-        180,                // forcedOffensive (+ si IA, - si adversaire via le code)
-        120,                // forcedDefensive (+ si IA, - si adversaire via le code)
-       -150,                // forcedDanger    (- si IA, + si adversaire via le code)
-       -70,               // Free move
+        180,                // forcedOffensive
+        120,                // forcedDefensive
+       -120,
+       -180,                // forcedDanger
+       -70,                 // Free move
         500,      -500,     // Meta importance pressure
         1,                  // Multiplicateur pour boardPositionBonus
         600,      -600      // Meta Near Win
@@ -116,12 +118,13 @@ private:
         3, 2, 3
     };
 
-    Features extract(const UltimateBoard& b, CellState me, CellState opp, CellState turnPlayer) const;
+    // Extraction découplée basée uniquement sur l'acteur du tour ('me') et son opposant ('opp')
+    Features extract(const UltimateBoard& b, CellState me, CellState opp) const;
 
     void extractTerminal(const UltimateBoard& b, Features& f, CellState me, CellState opp) const;
     void extractMeta(const UltimateBoard& b, Features& f, CellState me, CellState opp) const;
     void extractSubBoards(const UltimateBoard& b, Features& f, CellState me, CellState opp) const;
-    void extractForcedMoves(const UltimateBoard& b, Features& f, CellState me, CellState opp, CellState turnPlayer) const;
+    void extractForcedMoves(const UltimateBoard& b, Features& f, CellState me, CellState opp) const;
     void extractMetaImportance(const UltimateBoard& b, int boardIndex, CellState me, CellState opp, Features& f) const;
 
     int dot(const Features& f) const;

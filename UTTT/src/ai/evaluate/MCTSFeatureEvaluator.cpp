@@ -5,22 +5,30 @@ MCTSFeatureEvaluator::MCTSFeatureEvaluator() {}
 
 int MCTSFeatureEvaluator::evaluate(const GameState& state) const
 {
-    // Mode standard : Évalue la grille selon le joueur du tour actuel
     return evaluate(state, state.getCurrentPlayer());
 }
 
 int MCTSFeatureEvaluator::evaluate(const GameState& state, CellState perspective) const
 {
     const UltimateBoard& b = state.getBoard();
-    CellState me = perspective; // L'IA racine de la recherche
-    CellState opp = (me == CellState::X) ? CellState::O : CellState::X;
 
-    // turnPlayer est indispensable pour savoir à qui est le tour à ce nœud précis de l'arbre
-    Features f = extract(b, me, opp, state.getCurrentPlayer());
-    return dot(f);
+    CellState turnPlayer = state.getCurrentPlayer();
+    CellState oppPlayer = (turnPlayer == CellState::X) ? CellState::O : CellState::X;
+
+    Features f = extract(b, turnPlayer, oppPlayer);
+    int rawScore = dot(f);
+
+    if (turnPlayer == perspective)
+    {
+        return rawScore;
+    }
+    else
+    {
+        return -rawScore;
+    }
 }
 
-MCTSFeatureEvaluator::Features MCTSFeatureEvaluator::extract(const UltimateBoard& b, CellState me, CellState opp, CellState turnPlayer) const
+MCTSFeatureEvaluator::Features MCTSFeatureEvaluator::extract(const UltimateBoard& b, CellState me, CellState opp) const
 {
     Features f;
     extractTerminal(b, f, me, opp);
@@ -30,7 +38,7 @@ MCTSFeatureEvaluator::Features MCTSFeatureEvaluator::extract(const UltimateBoard
 
     extractMeta(b, f, me, opp);
     extractSubBoards(b, f, me, opp);
-    extractForcedMoves(b, f, me, opp, turnPlayer);
+    extractForcedMoves(b, f, me, opp);
     return f;
 }
 
@@ -46,6 +54,7 @@ void MCTSFeatureEvaluator::extractMeta(const UltimateBoard& b, Features& f, Cell
     int myThreats = 0;
     int oppThreats = 0;
 
+    // 1. ANALYSE STATIQUE DES PROPRIÉTÉS ET DES COMPTEURS LOCAUX (NEAR WIN)
     for (int i = 0; i < 9; i++)
     {
         const SubBoard& sb = b.getBoard(i);
@@ -62,6 +71,7 @@ void MCTSFeatureEvaluator::extractMeta(const UltimateBoard& b, Features& f, Cell
             continue;
         }
 
+        // Si la sous-grille est pleine (match nul), elle n'apporte aucun point de structure locale (Near Win)
         if (sb.isFull())
             continue;
 
@@ -86,16 +96,32 @@ void MCTSFeatureEvaluator::extractMeta(const UltimateBoard& b, Features& f, Cell
         f.metaOpponentNearWin += oppLocalThreats * boardWeight[i];
     }
 
+    // 2. ANALYSE DYNAMIQUE DES ALIGNEMENTS MACRO (PROTÉGÉE CONTRE LES ÉGALITÉS)
     for (const auto& line : WIN_LINES)
     {
         int myCount = 0; int oppCount = 0; int emptyCount = 0;
+        bool lineIsBlocked = false;
+
         for (int idx : line)
         {
-            CellState owner = b.getBoard(idx).checkWinner();
+            const SubBoard& sb = b.getBoard(idx);
+            CellState owner = sb.checkWinner();
+
+            // PROTECTION STRICTE : Si la case est une égalité locale (EMPTY et FULL), la ligne macro est morte
+            if (owner == CellState::EMPTY && sb.isFull())
+            {
+                lineIsBlocked = true;
+                break;
+            }
+
             if (owner == me)       myCount++;
             else if (owner == opp) oppCount++;
             else                   emptyCount++;
         }
+
+        // Si la ligne macro est condamnée par un match nul local, on l'oublie immédiatement
+        if (lineIsBlocked)
+            continue;
 
         if (myCount > 0 && oppCount > 0)
             continue;
@@ -124,7 +150,6 @@ void MCTSFeatureEvaluator::extractMeta(const UltimateBoard& b, Features& f, Cell
     if (myThreats >= 2)  f.metaFork++;
     if (oppThreats >= 2) f.metaOpponentFork++;
 }
-
 void MCTSFeatureEvaluator::extractSubBoards(const UltimateBoard& b, Features& f, CellState me, CellState opp) const
 {
     for (int boardIdx = 0; boardIdx < 9; boardIdx++)
@@ -183,7 +208,7 @@ void MCTSFeatureEvaluator::extractSubBoards(const UltimateBoard& b, Features& f,
     }
 }
 
-void MCTSFeatureEvaluator::extractForcedMoves(const UltimateBoard& b, Features& f, CellState me, CellState opp, CellState turnPlayer) const
+void MCTSFeatureEvaluator::extractForcedMoves(const UltimateBoard& b, Features& f, CellState me, CellState opp) const
 {
     int boardIndex = b.getActiveBoard();
     if (boardIndex == -1)
@@ -201,51 +226,24 @@ void MCTSFeatureEvaluator::extractForcedMoves(const UltimateBoard& b, Features& 
 
     extractMetaImportance(b, boardIndex, me, opp, f);
 
-    // Détermination de qui est actif à ce niveau de l'arbre et de son opposant direct
-    CellState active = turnPlayer;
-    CellState inactive = (active == CellState::X) ? CellState::O : CellState::X;
-
     for (const auto& line : WIN_LINES)
     {
-        int activeCount = 0; int inactiveCount = 0; int emptyCount = 0;
+        int myCount = 0; int oppCount = 0; int emptyCount = 0;
         for (int idx : line)
         {
             CellState owner = sb.getCell(idx).getState();
-            if (owner == active)        activeCount++;
-            else if (owner == inactive) inactiveCount++;
-            else                        emptyCount++;
+            if (owner == me)       myCount++;
+            else if (owner == opp) oppCount++;
+            else                   emptyCount++;
         }
 
-        // TACTIQUE SYMETRIQUE :
-        // Si le joueur actif a 2 pions, il peut clore la macro-case.
-        // Si cet actif est l'IA, le score grimpe (+), si c'est l'adversaire, le score baisse (-)
-        if (activeCount == 2 && emptyCount == 1)
-        {
-            if (active == me) f.forcedOffensive++;
-            else              f.forcedOffensive--;
-        }
-
-        // Si le joueur inactif a 2 pions, le joueur actif a l'opportunité cruciale de bloquer.
-        if (inactiveCount == 2 && emptyCount == 1)
-        {
-            if (active == me) f.forcedDefensive++;
-            else              f.forcedDefensive--;
-        }
-
-        // Si le joueur inactif possède un pion installé sur la ligne, le joueur actif subit la pression.
-        if (inactiveCount == 1 && emptyCount == 2)
-        {
-            if (active == me) f.forcedDanger++;
-            else              f.forcedDanger--;
-        }
+        if(emptyCount == 3) f.forcedGood ++;
+        if (myCount == 1 && oppCount == 1)       f.forcedVeryGood++;
+        if (oppCount == 2 && emptyCount == 1)      f.forcedVeryBad++;
+        if (oppCount == 1 && emptyCount == 2)      f.forcedBad++;
     }
 
-    // Le bonus lié à la contrainte géométrique s'inverse lui aussi selon le joueur actif
-    if (active == me) {
-        f.boardPositionBonus -= boardWeight[boardIndex];
-    } else {
-        f.boardPositionBonus += boardWeight[boardIndex];
-    }
+    f.boardPositionBonus -= boardWeight[boardIndex];
 }
 
 void MCTSFeatureEvaluator::extractMetaImportance(const UltimateBoard& b, int boardIndex, CellState me, CellState opp, Features& f) const
@@ -275,8 +273,9 @@ void MCTSFeatureEvaluator::extractMetaImportance(const UltimateBoard& b, int boa
             if (owner == me)       myCount++;
             else if (owner == opp) oppCount++;
         }
-
-        if (myCount == 2)  f.metaImportanceGood++;
+        if (myCount == 1)  f.metaImportanceGood++;
+        if (myCount == 0)  f.metaImportanceBad++;
+        if (myCount == 2)  f.metaImportanceBad++;
         if (oppCount == 2) f.metaImportanceBad++;
     }
 }
@@ -303,9 +302,10 @@ int MCTSFeatureEvaluator::dot(const Features& f) const
     score += f.subFork * w.subFork;
     score += f.subOpponentFork * w.subOpponentFork;
 
-    score += f.forcedOffensive * w.forcedOffensive;
-    score += f.forcedDefensive * w.forcedDefensive;
-    score += f.forcedDanger * w.forcedDanger;
+    score += f.forcedGood * w.forcedGood;
+    score += f.forcedVeryGood * w.forcedVeryGood;
+    score += f.forcedBad * w.forcedBad;
+    score += f.forcedVeryBad * w.forcedVeryBad;
 
     score += f.freeMove * w.freeMove;
     score += f.metaImportanceGood * w.metaImportanceGood;

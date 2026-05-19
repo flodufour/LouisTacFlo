@@ -129,7 +129,7 @@ bool UltimateBoard::isEmpty() const
 void UltimateBoard::undoMove(const AIMove& move, int prevActiveBoard)
 {
     _boards[move.boardIndex].undoMove(move.cellIndex);
-    updateActiveBoard(prevActiveBoard);
+    _activeBoard = prevActiveBoard;
 }
 
 int UltimateBoard::getMovesLeftBoard() const{

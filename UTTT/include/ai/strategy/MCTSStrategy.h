@@ -15,7 +15,7 @@ public:
      * @param explorationConst Constante UCT (1.414 par défaut)
      * @param maxTimeMs Temps maximum alloué en millisecondes (3000ms pour éviter le Timeout)
      */
-    MCTSStrategy(IEvaluator* lightEvaluator, double explorationConst = 1.414, int maxTimeMs = 3000);
+    MCTSStrategy(IEvaluator* mCTSFeatureEvaluator, double explorationConst = 1.414, int maxTimeMs = 3000);
     virtual ~MCTSStrategy() override = default;
 
     virtual AIMove chooseMove(GameState& state) override;
@@ -45,7 +45,7 @@ private:
     double getUCB1(const MCTSNode* node, const MCTSNode* child) const;
     double normalizeScore(int rawScore) const;
 
-    IEvaluator* _lightEvaluator;
+    IEvaluator* _mCTSFeatureEvaluator;
     double _explorationConst;
     int _maxTimeMs;
     std::mt19937 _rng;
