@@ -11,7 +11,7 @@
 class MCTSStrategy : public IStrategy {
 public:
     /**
-     * @param lightEvaluator Pointeur vers ton FeatureEvaluatorLight
+     * @param lightEvaluator Pointeur vers ton MCTSFeatureEvaluator (passé via l'interface IEvaluator)
      * @param explorationConst Constante UCT (1.414 par défaut)
      * @param maxTimeMs Temps maximum alloué en millisecondes (3000ms pour éviter le Timeout)
      */
@@ -28,10 +28,10 @@ private:
         std::vector<std::unique_ptr<MCTSNode>> children;
 
         double visits = 0.0;
-        double wins = 0.0;
+        double wins = 0.0; // Accumule les scores normalisés (0.0 à 1.0) du point de vue de l'IA racine
 
         std::vector<AIMove> unvisitedMoves;
-        CellState playerToMove;
+        CellState playerToMove; // Joueur qui doit prendre la décision DEPUIS ce nœud
         bool isFullyExpanded = false;
 
         MCTSNode(AIMove m, MCTSNode* p, CellState player)

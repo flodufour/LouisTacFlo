@@ -8,6 +8,7 @@
 #include "ai/evaluate/FeatureEvaluator.h"
 #include "ai/evaluate/FeatureEvaluatorLight.h"
 #include "ai/training/TrainingFeatureEvaluator.h"
+#include "ai/evaluate/MCTSFeatureEvaluator.h"
 #include <iostream>
 
 int GameManager::s_gameId = 0;
@@ -27,9 +28,12 @@ GameManager::GameManager(long long runTimestamp)
     // Training !!
     //_evaluator = std::make_unique<TrainingFeatureEvaluator>();
 
+    _mctsEvaluator = std::make_unique<MCTSFeatureEvaluator>();
+
+    _mCTSStrategy = std::make_unique<MCTSStrategy>(_mctsEvaluator.get(), 0.1, 200);
+
     _minimaxStrategy = std::make_unique<MinimaxStrategy>(_evaluator.get(), _lightEvaluator.get(), 15);
 
-    _mCTSStrategy = std::make_unique<MCTSStrategy>(_evaluator.get(),1.414, 3800);
  }
 
 void GameManager::init(CellState mySide)

@@ -1,4 +1,5 @@
 #include "ai/strategy/MCTSStrategy.h"
+#include "ai/evaluate/MCTSFeatureEvaluator.h" // Indispensable pour le dynamic_cast de perspective
 #include <limits>
 #include <cmath>
 #include <algorithm>
@@ -12,6 +13,7 @@ MCTSStrategy::MCTSStrategy(IEvaluator* lightEvaluator, double explorationConst, 
 }
 
 double MCTSStrategy::normalizeScore(int rawScore) const {
+    // Normalisation douce adaptée à l'échelle de tes poids miroirs MCTS (~ -1000 à +1000)
     double scaling = 400.0;
     return 1.0 / (1.0 + std::exp(-static_cast<double>(rawScore) / scaling));
 }
@@ -20,9 +22,11 @@ AIMove MCTSStrategy::chooseMove(GameState& state) {
     auto startTime = std::chrono::high_resolution_clock::now();
     CellState aiPlayer = state.getCurrentPlayer();
 
+    // Création de la racine : représente l'état actuel, c'est à l'IA de jouer
     auto root = std::make_unique<MCTSNode>(AIMove{-1, -1}, nullptr, aiPlayer);
     root->unvisitedMoves = state.getValidMoves();
 
+    // Si un seul coup est possible, on l'exécute immédiatement (économie de temps CPU)
     if (root->unvisitedMoves.size() == 1) {
         return root->unvisitedMoves[0];
     }
@@ -30,10 +34,12 @@ AIMove MCTSStrategy::chooseMove(GameState& state) {
     int iterations = 0;
     int maxDepthReached = 0;
 
+    // Vecteur de rollback alloué une seule fois pour éviter les ralentissements liés aux allocations dynamiques
     std::vector<MoveUndo> undoStack;
     undoStack.reserve(81);
 
     while (true) {
+        // Contrôle du temps strict toutes les 64 itérations
         if ((iterations & 63) == 0) {
             auto now = std::chrono::high_resolution_clock::now();
             auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - startTime).count();
@@ -42,14 +48,17 @@ AIMove MCTSStrategy::chooseMove(GameState& state) {
             }
         }
 
+        // 1. SELECTION
         MCTSNode* selectedNode = select(root.get(), state, undoStack, 0, maxDepthReached);
         MCTSNode* expandedNode = selectedNode;
 
+        // 2. EXPANSION
         if (!state.isTerminal()) {
             expandedNode = expand(selectedNode, state, undoStack);
             maxDepthReached = std::max(maxDepthReached, static_cast<int>(undoStack.size()));
         }
 
+        // 3. EVALUATION DIRECTE VIA LA PERSPECTIVE SYMETRIQUE
         double score = 0.5;
         if (state.isTerminal()) {
             CellState winner = state.getWinner();
@@ -57,12 +66,25 @@ AIMove MCTSStrategy::chooseMove(GameState& state) {
             else if (winner == CellState::EMPTY) score = 0.5;
             else score = 0.0;
         } else {
-            int rawScore = _lightEvaluator->evaluate(state);
+            // Tentative de récupération de la surcharge symétrique par perspective de ton nouvel évaluateur
+            auto* mctsEval = dynamic_cast<MCTSFeatureEvaluator*>(_lightEvaluator);
+            int rawScore = 0;
+
+            if (mctsEval != nullptr) {
+                // FORCE l'évaluation du point de vue invariant de ton IA racine
+                rawScore = mctsEval->evaluate(state, aiPlayer);
+            } else {
+                // Sécurité si l'interface pointe vers un autre type d'évaluateur
+                rawScore = _lightEvaluator->evaluate(state);
+            }
+
             score = normalizeScore(rawScore);
         }
 
+        // 4. BACKPROPAGATION
         backpropagate(expandedNode, score);
 
+        // BACKTRACKING : On nettoie et réinitialise l'état du plateau pour l'itération suivante
         while (!undoStack.empty()) {
             state.undoMove(undoStack.back());
             undoStack.pop_back();
@@ -74,6 +96,7 @@ AIMove MCTSStrategy::chooseMove(GameState& state) {
     std::cout << "[MCTS_EVAL] Iterations executees : " << iterations
               << " | Profondeur max de l'arbre : " << maxDepthReached << std::endl;
 
+    // Sélection robuste basée sur le nœud ayant reçu le plus grand nombre de visites
     MCTSNode* bestChild = nullptr;
     double maxVisits = -1.0;
 
@@ -125,6 +148,7 @@ MCTSStrategy::MCTSNode* MCTSStrategy::expand(MCTSNode* node, GameState& state, s
     size_t index = dist(_rng);
     AIMove move = node->unvisitedMoves[index];
 
+    // Extraction en O(1)
     node->unvisitedMoves[index] = node->unvisitedMoves.back();
     node->unvisitedMoves.pop_back();
 
@@ -132,6 +156,7 @@ MCTSStrategy::MCTSNode* MCTSStrategy::expand(MCTSNode* node, GameState& state, s
         node->isFullyExpanded = true;
     }
 
+    // Alternance stricte des joueurs au fil de la descente de l'arbre virtuel
     CellState nextPlayer = (node->playerToMove == CellState::X) ? CellState::O : CellState::X;
 
     auto child = std::make_unique<MCTSNode>(move, node, nextPlayer);
@@ -145,7 +170,7 @@ MCTSStrategy::MCTSNode* MCTSStrategy::expand(MCTSNode* node, GameState& state, s
 void MCTSStrategy::backpropagate(MCTSNode* node, double score) {
     while (node != nullptr) {
         node->visits += 1.0;
-        node->wins += score;
+        node->wins += score; // Le score étant figé sur la perspective absolue de l'IA, on l'additionne partout
         node = node->parent;
     }
 }
@@ -157,12 +182,16 @@ double MCTSStrategy::getUCB1(const MCTSNode* node, const MCTSNode* child) const 
 
     double exploitation = child->wins / child->visits;
 
+    // Récupération de l'identifiant de notre IA en remontant à la racine
     const MCTSNode* root = node;
     while (root->parent != nullptr) {
         root = root->parent;
     }
     CellState aiPlayer = root->playerToMove;
 
+    // Logique Minimax intégrée à l'UCT :
+    // Si le nœud actuel appartient à l'adversaire (node->playerToMove != aiPlayer),
+    // l'adversaire cherche à minimiser nos gains. Sa valeur d'exploitation est donc (1.0 - la nôtre).
     if (node->playerToMove != aiPlayer) {
         exploitation = 1.0 - exploitation;
     }

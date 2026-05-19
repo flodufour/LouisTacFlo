@@ -27,8 +27,10 @@ private:
     CellState _opponent;
     std::unique_ptr<IEvaluator> _evaluator;
     std::unique_ptr<IEvaluator> _lightEvaluator;
+    std::unique_ptr<IEvaluator> _mctsEvaluator;
     std::unique_ptr<IStrategy> _minimaxStrategy;
     std::unique_ptr<IStrategy> _mCTSStrategy;
+
     std::unique_ptr<DataLogger> _logger;
 
 public:
