@@ -19,8 +19,6 @@ GameManager::GameManager(long long runTimestamp)
 {
     _runTimestamp = runTimestamp;
 
-    //_evaluator = std::make_unique<HeuristicEvaluator>();
-
     _evaluator = std::make_unique<FeatureEvaluator>();
 
     _lightEvaluator = std::make_unique<FeatureEvaluatorLight>();
@@ -30,7 +28,7 @@ GameManager::GameManager(long long runTimestamp)
 
     _mctsEvaluator = std::make_unique<MCTSFeatureEvaluator>();
 
-    _mCTSStrategy = std::make_unique<MCTSStrategy>(_mctsEvaluator.get(),0.5, 4000);
+    _mCTSStrategy = std::make_unique<MCTSStrategy>(_mctsEvaluator.get(),0.1, 350);
 
     _minimaxStrategy = std::make_unique<MinimaxStrategy>(_evaluator.get(), _lightEvaluator.get(), 15);
 
@@ -112,8 +110,14 @@ void GameManager::applyMove(const AIMove& move)
 AIMove GameManager::chooseMove()
 {
     int movesLeft = _state.getBoard().getMovesLeftBoard();
+
+    // test MCTS only
+    //movesLeft = 16;
+
+    // test Minimax only
+    movesLeft = 14;
+
     if(movesLeft > 15){
-            std::cout << movesLeft;
         return _mCTSStrategy->chooseMove(_state);
     }
     return _minimaxStrategy->chooseMove(_state);
