@@ -19,5 +19,6 @@ public:
     /// @brief Virtual destructor for safe polymorphic deletion.
     virtual ~IStrategy() = default;
 
+    /// @brief Reset for the strategy.
     virtual void reset() {}
 };

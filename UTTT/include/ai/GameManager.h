@@ -3,7 +3,6 @@
 #include "core/GameState.h"
 #include "main.h"
 #include "ai/strategy/IStrategy.h"
-#include "ai/training/DataLogger.h"
 #include "ai/evaluate/IEvaluator.h"
 #include <memory>
 
@@ -27,11 +26,7 @@ private:
     CellState _opponent;
     std::unique_ptr<IEvaluator> _evaluator;
     std::unique_ptr<IEvaluator> _lightEvaluator;
-    std::unique_ptr<IEvaluator> _mctsEvaluator;
     std::unique_ptr<IStrategy> _minimaxStrategy;
-    std::unique_ptr<IStrategy> _mCTSStrategy;
-
-    std::unique_ptr<DataLogger> _logger;
 
 public:
 

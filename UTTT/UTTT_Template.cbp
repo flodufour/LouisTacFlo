@@ -91,6 +91,7 @@
 		<Unit filename="src/ai/evaluate/FeatureEvaluator.cpp" />
 		<Unit filename="src/ai/evaluate/FeatureEvaluatorLight.cpp" />
 		<Unit filename="src/ai/evaluate/HeuristicEvaluator.cpp" />
+		<Unit filename="src/ai/evaluate/MCTSFeatureEvaluator.cpp" />
 		<Unit filename="src/ai/strategy/MCTSStrategy.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
