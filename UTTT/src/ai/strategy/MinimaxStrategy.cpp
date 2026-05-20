@@ -11,16 +11,18 @@ MinimaxStrategy::MinimaxStrategy(IEvaluator* evaluator, IEvaluator* evaluatorLig
 {
     _transpositionTable.resize(TT_SIZE);
 }
+static uint64_t totalNodes = 0;
 
 AIMove MinimaxStrategy::chooseMove(GameState& state) {
+    totalNodes = 0;
     auto start = std::chrono::high_resolution_clock::now();
     AIMove globalBestMove;
 
     int remainingMoves = state.getMovesLeft();
     int effectiveMaxDepth = std::min(_maxDepth, remainingMoves);
 
-    for (int d = 1; d <= effectiveMaxDepth && (std::chrono::high_resolution_clock::now() - start) < std::chrono::milliseconds(200); ++d) {
-        std::cout << d << std::endl;
+    for (int d = 1; d <= effectiveMaxDepth && (std::chrono::high_resolution_clock::now() - start) < std::chrono::milliseconds(2000); ++d) {
+        std::cout << "Current depth : " << d << std::endl;
         int alpha = -9999999;
         int beta  =  9999999;
 
@@ -55,11 +57,27 @@ AIMove MinimaxStrategy::chooseMove(GameState& state) {
         if (bestScoreIteration > 800000) break;
     }
 
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+
+    std::cout << "\n==========================================" << std::endl;
+    std::cout << "                   STATS                  " << std::endl;
+    std::cout << "==========================================" << std::endl;
+    std::cout << "->Duration     : " << duration << " ms" << std::endl;
+    std::cout << "->Total Nodes       : " << totalNodes << std::endl;
+    if (duration > 0) {
+        std::cout << "-> Search Time : " << (totalNodes / duration) << " noeuds/ms" << std::endl;
+    } else {
+        std::cout << "-> Search Time : To fast to be in ms." << std::endl;
+    }
+    std::cout << "==========================================\n" << std::endl;
+
     return globalBestMove;
 }
 
 int MinimaxStrategy::minimax(GameState& state, int depth, bool maximizing, int alpha, int beta)
 {
+    totalNodes++;
     uint64_t hash = state.getHash();
     int alphaOrig = alpha;
 
@@ -143,34 +161,19 @@ struct ScoredMove {
 void MinimaxStrategy::orderMovesWithEval(GameState& state, std::vector<AIMove>& moves, const AIMove& ttHint, bool maximizing, int depth) {
     if (moves.size() <= 1) return;
 
-    std::vector<ScoredMove> scoredMoves;
-    scoredMoves.reserve(moves.size());
+    std::sort(moves.begin(), moves.end(), [&](const AIMove& a, const AIMove& b) {
+        int scoreA = 0;
+        int scoreB = 0;
 
-    for (const auto& move : moves) {
-        int score = 0;
+        if (a == ttHint) scoreA += 100000;
+        if (b == ttHint) scoreB += 100000;
 
-        if (move == ttHint) {
-            score = maximizing ? 9999999 : -9999999;
-        } else {
-            auto undo = state.applyMoveFast(move);
-            score = _evaluatorLight->evaluate(state);
-            state.undoMove(undo);
-        }
+        if (a.cellIndex == 4) scoreA += 50;
+        if (b.cellIndex == 4) scoreB += 50;
 
-        scoredMoves.push_back({move, score});
-    }
+        if (a.cellIndex == 0 || a.cellIndex == 2 || a.cellIndex == 6 || a.cellIndex == 8) scoreA += 20;
+        if (b.cellIndex == 0 || b.cellIndex == 2 || b.cellIndex == 6 || b.cellIndex == 8) scoreB += 20;
 
-    if (maximizing) {
-        std::sort(scoredMoves.begin(), scoredMoves.end(), [](const ScoredMove& a, const ScoredMove& b) {
-            return a.score > b.score;
-        });
-    } else {
-        std::sort(scoredMoves.begin(), scoredMoves.end(), [](const ScoredMove& a, const ScoredMove& b) {
-            return a.score < b.score;
-        });
-    }
-
-    for (size_t i = 0; i < moves.size(); ++i) {
-        moves[i] = scoredMoves[i].move;
-    }
+        return scoreA > scoreB;
+    });
 }
