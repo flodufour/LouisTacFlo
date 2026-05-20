@@ -10,8 +10,6 @@
 
 int GameManager::s_gameId = 0;
 
-
-
 GameManager::GameManager(long long runTimestamp)
 {
     _runTimestamp = runTimestamp;
@@ -26,7 +24,6 @@ GameManager::GameManager(long long runTimestamp)
 
 void GameManager::init(CellState mySide)
 {
-    // Training !!
     if (_minimaxStrategy) {
         _minimaxStrategy->reset();
     }
@@ -46,10 +43,6 @@ void GameManager::init(CellState mySide)
 void GameManager::finalizeGame()
 {
     CellState w = _state.getWinner();
-
-    int result =
-        (w == CellState::X) ? 1 :
-        (w == CellState::O) ? 2 : 0;
 }
 
 void GameManager::applyMove(const AIMove& move)

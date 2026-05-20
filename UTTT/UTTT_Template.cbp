@@ -56,11 +56,6 @@
 		<Unit filename="include/ai/evaluate/HeuristicEvaluator.h" />
 		<Unit filename="include/ai/evaluate/IEvaluator.h" />
 		<Unit filename="include/ai/strategy/IStrategy.h" />
-		<Unit filename="include/ai/strategy/MCTSStrategy.h">
-			<Option target="Debug" />
-			<Option target="Release" />
-			<Option target="Training" />
-		</Unit>
 		<Unit filename="include/ai/strategy/MinimaxStrategy.h" />
 		<Unit filename="include/ai/strategy/RandomStrategy.h">
 			<Option target="Debug" />
@@ -72,10 +67,6 @@
 			<Option target="Release" />
 			<Option target="Training" />
 		</Unit>
-		<Unit filename="include/ai/training/DataLogger.h" />
-		<Unit filename="include/ai/training/GeneticAlgorithm.h" />
-		<Unit filename="include/ai/training/MatchRunner.h" />
-		<Unit filename="include/ai/training/TrainingFeatureEvaluator.h" />
 		<Unit filename="include/core/AIMove.h" />
 		<Unit filename="include/core/Cell.h" />
 		<Unit filename="include/core/GameState.h" />
@@ -91,12 +82,6 @@
 		<Unit filename="src/ai/evaluate/FeatureEvaluator.cpp" />
 		<Unit filename="src/ai/evaluate/FeatureEvaluatorLight.cpp" />
 		<Unit filename="src/ai/evaluate/HeuristicEvaluator.cpp" />
-		<Unit filename="src/ai/evaluate/MCTSFeatureEvaluator.cpp" />
-		<Unit filename="src/ai/strategy/MCTSStrategy.cpp">
-			<Option target="Debug" />
-			<Option target="Release" />
-			<Option target="Training" />
-		</Unit>
 		<Unit filename="src/ai/strategy/MinimaxStrategy.cpp" />
 		<Unit filename="src/ai/strategy/RandomStrategy.cpp">
 			<Option target="Debug" />
@@ -106,13 +91,6 @@
 		<Unit filename="src/ai/strategy/SimpleStrategy.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
-			<Option target="Training" />
-		</Unit>
-		<Unit filename="src/ai/training/DataLogger.cpp" />
-		<Unit filename="src/ai/training/GeneticAlgorithm.cpp" />
-		<Unit filename="src/ai/training/MatchRunner.cpp" />
-		<Unit filename="src/ai/training/TrainingFeatureEvaluator.cpp" />
-		<Unit filename="src/ai/training/TrainingMain.cpp">
 			<Option target="Training" />
 		</Unit>
 		<Unit filename="src/core/Cell.cpp" />
