@@ -16,11 +16,12 @@ public:
 
     // 2. Structure de la table de transposition
     struct TTEntry {
-        uint64_t key;
-        int value;      // Score de l'évaluation
-        int depth;      // Profondeur de recherche
-        TTFlag flag;    // Type de valeur (Exacte, Alpha ou Beta)
-        AIMove bestMove;// Le meilleur coup trouvé à cette position
+        uint64_t key = 0;
+        int value = 0;
+        int depth = -1;
+        TTFlag flag = TTFlag::EXACT;
+        AIMove bestMove;
+        bool wasMaximizing = false;
     };
 
     MinimaxStrategy(IEvaluator* evaluator, IEvaluator* evaluatorLight, int depth = 3);

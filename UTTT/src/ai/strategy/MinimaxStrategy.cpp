@@ -6,8 +6,6 @@
 #include <ctime>
 #include <chrono>
 
-
-
 MinimaxStrategy::MinimaxStrategy(IEvaluator* evaluator, IEvaluator* evaluatorLight, int depth)
     : _evaluator(evaluator), _evaluatorLight(evaluatorLight), _maxDepth(depth)
 {
@@ -15,19 +13,14 @@ MinimaxStrategy::MinimaxStrategy(IEvaluator* evaluator, IEvaluator* evaluatorLig
 }
 
 AIMove MinimaxStrategy::chooseMove(GameState& state) {
-
-    std::fill(_transpositionTable.begin(), _transpositionTable.end(), TTEntry{});
     auto start = std::chrono::high_resolution_clock::now();
     AIMove globalBestMove;
 
     int remainingMoves = state.getMovesLeft();
     int effectiveMaxDepth = std::min(_maxDepth, remainingMoves);
 
-
-
-    for (int d = 1; d <= effectiveMaxDepth && (std::chrono::high_resolution_clock::now() - start) < std::chrono::milliseconds(100) ; ++d) {
-
-    std::cout << d <<std::endl;
+    for (int d = 1; d <= effectiveMaxDepth && (std::chrono::high_resolution_clock::now() - start) < std::chrono::milliseconds(200); ++d) {
+        std::cout << d << std::endl;
         int alpha = -9999999;
         int beta  =  9999999;
 
@@ -37,7 +30,7 @@ AIMove MinimaxStrategy::chooseMove(GameState& state) {
         TTEntry& entry = _transpositionTable[h & (TT_SIZE - 1)];
 
         AIMove hint;
-        if (entry.key == h) {
+        if (entry.key == h && entry.wasMaximizing == true) {
             hint = entry.bestMove;
         }
 
@@ -72,7 +65,7 @@ int MinimaxStrategy::minimax(GameState& state, int depth, bool maximizing, int a
 
     TTEntry& entry = _transpositionTable[hash & (TT_SIZE - 1)];
 
-    if (entry.key == hash && entry.depth >= depth) {
+    if (entry.key == hash && entry.depth >= depth && entry.wasMaximizing == maximizing) {
         if (entry.flag == TTFlag::EXACT) return entry.value;
         else if (entry.flag == TTFlag::LOWER_BOUND) alpha = std::max(alpha, entry.value);
         else if (entry.flag == TTFlag::UPPER_BOUND) beta = std::min(beta, entry.value);
@@ -87,7 +80,7 @@ int MinimaxStrategy::minimax(GameState& state, int depth, bool maximizing, int a
     if (moves.empty()) return _evaluator->evaluate(state);
 
     AIMove hint;
-    if (entry.key == hash) {
+    if (entry.key == hash && entry.wasMaximizing == maximizing) {
         hint = entry.bestMove;
     }
 
@@ -125,16 +118,19 @@ int MinimaxStrategy::minimax(GameState& state, int depth, bool maximizing, int a
         }
     }
 
-    if (entry.key != hash || depth >= entry.depth) {
-        entry.key = hash;
-        entry.value = best;
-        entry.depth = depth;
-        entry.bestMove = bestMoveLocal;
 
-        if (best <= alphaOrig) entry.flag = TTFlag::UPPER_BOUND;
-        else if (best >= beta) entry.flag = TTFlag::LOWER_BOUND;
-        else entry.flag = TTFlag::EXACT;
-    }
+if (entry.key != hash && depth < entry.depth) {
+} else {
+    entry.key = hash;
+    entry.value = best;
+    entry.depth = depth;
+    entry.bestMove = bestMoveLocal;
+    entry.wasMaximizing = maximizing;
+
+    if (best <= alphaOrig) entry.flag = TTFlag::UPPER_BOUND;
+    else if (best >= beta) entry.flag = TTFlag::LOWER_BOUND;
+    else entry.flag = TTFlag::EXACT;
+}
 
     return best;
 }
