@@ -33,10 +33,6 @@ void GameManager::init(CellState mySide)
 
     _state.reset();
     _state.setPlayers(mySide);
-
-    if (_minimaxStrategy) {
-        _minimaxStrategy->reset();
-    }
 }
 
 

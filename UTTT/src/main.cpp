@@ -11,7 +11,7 @@ int main() {
     GameManager manager(start_timestamp);
     ArenaHost arena(manager);
 
-    arena.runSession(100, Level::MEDIUM_2);
+    arena.runSession(100, Level::MEDIUM_1);
 
     std::cerr << "MAIN FINISHED" << std::endl;
     return 0;

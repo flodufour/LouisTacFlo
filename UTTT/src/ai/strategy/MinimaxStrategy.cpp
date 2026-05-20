@@ -21,7 +21,7 @@ AIMove MinimaxStrategy::chooseMove(GameState& state) {
     int remainingMoves = state.getMovesLeft();
     int effectiveMaxDepth = std::min(_maxDepth, remainingMoves);
 
-    for (int d = 1; d <= effectiveMaxDepth && (std::chrono::high_resolution_clock::now() - start) < std::chrono::milliseconds(2000); ++d) {
+    for (int d = 1; d <= effectiveMaxDepth && (std::chrono::high_resolution_clock::now() - start) < std::chrono::milliseconds(10); ++d) {
         std::cout << "Current depth : " << d << std::endl;
         int alpha = -9999999;
         int beta  =  9999999;
@@ -66,7 +66,7 @@ AIMove MinimaxStrategy::chooseMove(GameState& state) {
     std::cout << "->Duration     : " << duration << " ms" << std::endl;
     std::cout << "->Total Nodes       : " << totalNodes << std::endl;
     if (duration > 0) {
-        std::cout << "-> Search Time : " << (totalNodes / duration) << " noeuds/ms" << std::endl;
+        std::cout << "-> Search Time : " << (totalNodes / duration) << " nodes/ms" << std::endl;
     } else {
         std::cout << "-> Search Time : To fast to be in ms." << std::endl;
     }

@@ -279,7 +279,7 @@ void FeatureEvaluator::extractForcedMoves(
         else if (myCount == 1 && emptyCount == 2)
             f.forcedVeryGood++;
 
-        if (oppCount == 2 && emptyCount == 1)
+        else if (oppCount == 2 && emptyCount == 1)
             f.forcedVeryBad++;
         else if (oppCount == 1 && emptyCount == 2)
             f.forcedBad++;
