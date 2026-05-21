@@ -24,18 +24,6 @@
 					<Add option="-O3" />
 				</Compiler>
 			</Target>
-			<Target title="Training">
-				<Option output="bin/Training/UTTT_Template" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj/Training/" />
-				<Option type="1" />
-				<Option compiler="gcc" />
-				<Option use_console_runner="0" />
-			</Target>
-			<Target title="NEW">
-				<Option output="UTTT_Template" prefix_auto="1" extension_auto="1" />
-				<Option type="0" />
-				<Option compiler="gcc" />
-			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
@@ -73,11 +61,7 @@
 		<Unit filename="src/core/GameState.cpp" />
 		<Unit filename="src/core/SubBoard.cpp" />
 		<Unit filename="src/core/UltimateBoard.cpp" />
-		<Unit filename="src/main.cpp">
-			<Option target="Debug" />
-			<Option target="Release" />
-			<Option target="NEW" />
-		</Unit>
+		<Unit filename="src/main.cpp" />
 		<Unit filename="src/utils/MoveConverter.cpp" />
 		<Unit filename="src/utils/ZobristHasher.cpp" />
 		<Unit filename="version.h" />

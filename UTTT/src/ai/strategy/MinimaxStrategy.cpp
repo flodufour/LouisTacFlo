@@ -21,7 +21,7 @@ AIMove MinimaxStrategy::chooseMove(GameState& state) {
     int remainingMoves = state.getMovesLeft();
     int effectiveMaxDepth = std::min(_maxDepth, remainingMoves);
 
-    for (int d = 1; d <= effectiveMaxDepth && (std::chrono::high_resolution_clock::now() - start) < std::chrono::milliseconds(10); ++d) {
+    for (int d = 1; d <= effectiveMaxDepth && (std::chrono::high_resolution_clock::now() - start) < std::chrono::milliseconds(100); ++d) {
         std::cout << "Current depth : " << d << std::endl;
         int alpha = -9999999;
         int beta  =  9999999;
