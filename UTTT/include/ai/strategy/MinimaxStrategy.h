@@ -24,7 +24,7 @@ public:
         bool wasMaximizing = false;
     };
 
-    MinimaxStrategy(IEvaluator* evaluator, IEvaluator* evaluatorLight, int depth = 3);
+    MinimaxStrategy(IEvaluator* evaluator, int depth = 3);
 
     AIMove chooseMove(GameState& state) override;
 

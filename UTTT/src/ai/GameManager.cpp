@@ -1,11 +1,6 @@
 #include "ai/GameManager.h"
-#include "ai/strategy/RandomStrategy.h"
-#include "ai/strategy/SimpleStrategy.h"
 #include "ai/strategy/MinimaxStrategy.h"
-#include "ai/evaluate/HeuristicEvaluator.h"
-#include "ai/strategy/SimpleStrategy.h"
 #include "ai/evaluate/FeatureEvaluator.h"
-#include "ai/evaluate/FeatureEvaluatorLight.h"
 #include <iostream>
 
 int GameManager::s_gameId = 0;
@@ -16,9 +11,7 @@ GameManager::GameManager(long long runTimestamp)
 
     _evaluator = std::make_unique<FeatureEvaluator>();
 
-    _lightEvaluator = std::make_unique<FeatureEvaluatorLight>();
-
-    _minimaxStrategy = std::make_unique<MinimaxStrategy>(_evaluator.get(), _lightEvaluator.get(), 15);
+    _minimaxStrategy = std::make_unique<MinimaxStrategy>(_evaluator.get(), 15);
 
  }
 

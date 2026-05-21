@@ -52,21 +52,9 @@
 		<Unit filename="include/ai/ArenaHost.h" />
 		<Unit filename="include/ai/GameManager.h" />
 		<Unit filename="include/ai/evaluate/FeatureEvaluator.h" />
-		<Unit filename="include/ai/evaluate/FeatureEvaluatorLight.h" />
-		<Unit filename="include/ai/evaluate/HeuristicEvaluator.h" />
 		<Unit filename="include/ai/evaluate/IEvaluator.h" />
 		<Unit filename="include/ai/strategy/IStrategy.h" />
 		<Unit filename="include/ai/strategy/MinimaxStrategy.h" />
-		<Unit filename="include/ai/strategy/RandomStrategy.h">
-			<Option target="Debug" />
-			<Option target="Release" />
-			<Option target="Training" />
-		</Unit>
-		<Unit filename="include/ai/strategy/SimpleStrategy.h">
-			<Option target="Debug" />
-			<Option target="Release" />
-			<Option target="Training" />
-		</Unit>
 		<Unit filename="include/core/AIMove.h" />
 		<Unit filename="include/core/Cell.h" />
 		<Unit filename="include/core/GameState.h" />
@@ -80,19 +68,7 @@
 		<Unit filename="src/ai/ArenaHost.cpp" />
 		<Unit filename="src/ai/GameManager.cpp" />
 		<Unit filename="src/ai/evaluate/FeatureEvaluator.cpp" />
-		<Unit filename="src/ai/evaluate/FeatureEvaluatorLight.cpp" />
-		<Unit filename="src/ai/evaluate/HeuristicEvaluator.cpp" />
 		<Unit filename="src/ai/strategy/MinimaxStrategy.cpp" />
-		<Unit filename="src/ai/strategy/RandomStrategy.cpp">
-			<Option target="Debug" />
-			<Option target="Release" />
-			<Option target="Training" />
-		</Unit>
-		<Unit filename="src/ai/strategy/SimpleStrategy.cpp">
-			<Option target="Debug" />
-			<Option target="Release" />
-			<Option target="Training" />
-		</Unit>
 		<Unit filename="src/core/Cell.cpp" />
 		<Unit filename="src/core/GameState.cpp" />
 		<Unit filename="src/core/SubBoard.cpp" />

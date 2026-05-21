@@ -6,8 +6,8 @@
 #include <ctime>
 #include <chrono>
 
-MinimaxStrategy::MinimaxStrategy(IEvaluator* evaluator, IEvaluator* evaluatorLight, int depth)
-    : _evaluator(evaluator), _evaluatorLight(evaluatorLight), _maxDepth(depth)
+MinimaxStrategy::MinimaxStrategy(IEvaluator* evaluator, int depth)
+    : _evaluator(evaluator), _maxDepth(depth)
 {
     _transpositionTable.resize(TT_SIZE);
 }
