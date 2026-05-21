@@ -5,26 +5,45 @@ AI implementation for Ultimate Tic Tac Toe featuring advanced search algorithms 
 ## Project Structure
 
 ```text
+include/
+├── ai/
+│   ├── evaluate/
+│   │   ├── FeatureEvaluator.h
+│   │   └── IEvaluator.h
+│   ├── strategy/
+│   │   ├── IStrategy.h
+│   │   └── MinimaxStrategy.h
+│   ├── ArenaHost.h
+│   └── GameManager.h
+├── core/
+│   ├── AIMove.h
+│   ├── Cell.h
+│   ├── GameState.h
+│   ├── SubBoard.h
+│   ├── UltimateBoard.h
+│   └── WinPatterns.h
+├── utils/
+│   ├── MoveConverter.h
+│   ├── MoveUndo.h
+│   └── ZobristHasher.h
+└── main.h
+
 src/
 ├── ai/
 │   ├── evaluate/
-│   │   └── FeatureEvaluator.cpp / .h
+│   │   └── FeatureEvaluator.cpp
 │   ├── strategy/
-│   │   └── MinimaxStrategy.cpp / .h
-│   ├── ArenaHost.cpp / .h
-│   └── GameManager.cpp / .h
-│
+│   │   └── MinimaxStrategy.cpp
+│   ├── ArenaHost.cpp
+│   └── GameManager.cpp
 ├── core/
-│   ├── Cell.cpp / .h
-│   ├── GameState.cpp / .h
-│   ├── SubBoard.cpp / .h
-│   └── UltimateBoard.cpp / .h
-│
+│   ├── Cell.cpp
+│   ├── GameState.cpp
+│   ├── SubBoard.cpp
+│   └── UltimateBoard.cpp
 ├── utils/
-│   ├── MoveConverter.cpp / .h
-│   ├── ZobristHasher.cpp / .h
-│   └── MoveUndo.h
-│
+│   ├── MoveConverter.cpp
+│   └── ZobristHasher.cpp
 └── main.cpp
 ```
 
