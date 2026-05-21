@@ -3,6 +3,10 @@
 #define MAIN_H_INCLUDED
 #include <string>
 
+/**
+ * @enum Level
+ * @brief Defines the difficulty levels available for the game engine.
+ */
 enum class Level {
     EASY_1,
     EASY_2,
@@ -14,11 +18,19 @@ enum class Level {
     VERY_HARD_2,
 };
 
+/**
+ * @enum Mode
+ * @brief Execution mode of the application.
+ */
 enum class Mode {
     DEBUG,
     ARENA,
 };
 
+/**
+ * @enum Winner
+ * @brief Represents the end-game result status.
+ */
 enum Winner {
     NO_WINNER,
     IA,
@@ -26,11 +38,19 @@ enum Winner {
     IA_AND_PLAYER,
 };
 
+/**
+ * @struct GameMove
+ * @brief Represents a move coordinates in standard row and column formats.
+ */
 struct GameMove {
     int row;
     int col;
 };
 
+/**
+ * @struct IGame
+ * @brief Interface providing the high-level API communication hook with the external core engine.
+ */
 struct IGame {
     virtual ~IGame() = default;
     virtual Winner getWinner() const = 0;

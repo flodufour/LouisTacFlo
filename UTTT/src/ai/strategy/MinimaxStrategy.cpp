@@ -153,11 +153,6 @@ if (entry.key != hash && depth < entry.depth) {
     return best;
 }
 
-struct ScoredMove {
-    AIMove move;
-    int score;
-};
-
 void MinimaxStrategy::orderMovesWithEval(GameState& state, std::vector<AIMove>& moves, const AIMove& ttHint, bool maximizing, int depth) {
     if (moves.size() <= 1) return;
 
