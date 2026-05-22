@@ -28,7 +28,7 @@ classDiagram
         -minimax(GameState& state, int depth, bool maximizing, int alpha, int beta) int
     }
     IStrategy <|-- MinimaxStrategy : implements
-    MinimaxStrategy --> IEvaluator : uses
+    MinimaxStrategy ..> IEvaluator : uses
 
     class TTFlag {
         <<enum>>
