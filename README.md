@@ -5,7 +5,7 @@ AI implementation for Ultimate Tic Tac Toe featuring advanced search algorithms 
 ## Documentation
 
 ### Global Architecture (UML)
-To visualize class organization, ownership hierarchies, and core AI components (interfaces, internal structures, search dependencies), refer to the [Mermaid Class Diagram](#ClassDiagram.md) at the beginning of this document.
+To visualize class organization, ownership hierarchies, and core AI components (interfaces, internal structures, search dependencies), refer to the [Mermaid Class Diagram](CLASSDIAGRAM.md).
 
 ### Automatic Generation via DoxyBlocks
 The source code is documented natively in the header files (`.h`) following the Doxygen standard format. 
