@@ -27,8 +27,8 @@ classDiagram
         -orderMovesWithEval(GameState& state, vector~AIMove~& moves, AIMove& ttHint, bool maximizing, int depth) void
         -minimax(GameState& state, int depth, bool maximizing, int alpha, int beta) int
     }
-    IStrategy <|-- MinimaxStrategy : implements
-    MinimaxStrategy ..> IEvaluator : uses
+    IStrategy <|-- MinimaxStrategy : inherits / implements
+    MinimaxStrategy o-- IEvaluator : aggregates (_evaluator pointers)
 
     class TTFlag {
         <<enum>>
@@ -46,8 +46,8 @@ classDiagram
         +AIMove bestMove
         +bool wasMaximizing
     }
-    MinimaxStrategy ..> TTEntry : contains
-    TTEntry --> TTFlag : uses
+    MinimaxStrategy *-- TTEntry : composes (_transpositionTable slots)
+    TTEntry *-- TTFlag : owns
 
     %% --- EVALUATION ENGINE ---
     class FeatureEvaluator {
@@ -63,7 +63,7 @@ classDiagram
         -evaluateMetaImportance(UltimateBoard b, int boardIndex, CellState me, CellState opp, Features& f) int
         -dot(Features f) int
     }
-    IEvaluator <|-- FeatureEvaluator : implements
+    IEvaluator <|-- FeatureEvaluator : inherits / implements
 
     class Features {
         <<struct>>
@@ -128,8 +128,8 @@ classDiagram
         +int metaNearWin
         +int metaOpponentNearWin
     }
-    FeatureEvaluator ..> Features : contains
-    FeatureEvaluator ..> Weights : contains
+    FeatureEvaluator ..> Features : depends on (local instantiation)
+    FeatureEvaluator *-- Weights : composes (static parameters)
 
     %% --- HIGH LEVEL ARCHITECTURE ---
     class ArenaHost {
@@ -139,8 +139,8 @@ classDiagram
         +runSession(int numGames, Level level) void
         -playSingleGame() void
     }
-    ArenaHost --> GameManager : orchestrates
-    ArenaHost --> MoveConverter : uses
+    ArenaHost o-- GameManager : aggregates (reference)
+    ArenaHost *-- MoveConverter : composes
 
     class GameManager {
         -int s_gameId$
@@ -159,9 +159,9 @@ classDiagram
         +getState() GameState&
         +getOpponent() CellState
     }
-    GameManager *-- GameState : owns
-    GameManager --> IStrategy : delegates search
-    GameManager --> IEvaluator : owns
+    GameManager *-- GameState : composes
+    GameManager *-- IStrategy : composes (unique_ptr lifecycle)
+    GameManager *-- IEvaluator : composes (unique_ptr lifecycle)
 
     %% --- GAME STATE & LOGIC ---
     class GameState {
@@ -192,7 +192,8 @@ classDiagram
         +getHash() uint64_t
         +updateHash(AIMove move, CellState player, int oldActive, int newActive) void
     }
-    GameState *-- UltimateBoard : owns
+    GameState *-- UltimateBoard : composes
+    GameState *-- CellState : owns
 
     class UltimateBoard {
         -array~SubBoard, 9~ _boards
@@ -210,7 +211,7 @@ classDiagram
         +undoMove(AIMove move, int prevActiveBoard) void
         +getMovesLeftBoard() int
     }
-    UltimateBoard *-- SubBoard : contains 9
+    UltimateBoard *-- SubBoard : composes (array of 9)
 
     class SubBoard {
         -array~Cell, 9~ _cells
@@ -228,7 +229,8 @@ classDiagram
         +undoMove(int index) void
         +getMovesLetftSubBoard() int
     }
-    SubBoard *-- Cell : contains 9
+    SubBoard *-- Cell : composes (array of 9)
+    SubBoard *-- CellState : owns
 
     class Cell {
         -CellState _state
@@ -237,7 +239,7 @@ classDiagram
         +setState(CellState newState) void
         +isEmpty() bool
     }
-    Cell --> CellState : tracks
+    Cell *-- CellState : composes
 
     class CellState {
         <<enum>>
@@ -254,7 +256,7 @@ classDiagram
         +init() void$
         +activeBoardIndex(int b) int$
     }
-    GameState --> Zobrist : optimizes hashing
+    GameState ..> Zobrist : static dependency
 
     class AIMove {
         <<struct>>
@@ -270,15 +272,15 @@ classDiagram
         +AIMove move
         +int prevActiveBoard
     }
-    MoveUndo --> AIMove : encapsulates
-    GameState ..> MoveUndo : returns/consumes
+    MoveUndo *-- AIMove : composes
+    GameState ..> MoveUndo : returns/consumes via data flow
 
     class MoveConverter {
         +toGameMove(AIMove m) GameMove
         +toAIMove(GameMove p) AIMove
     }
-    MoveConverter ..> AIMove : converts
+    MoveConverter ..> AIMove : standard data translation
 
     %% Relationships highlighting interactions with standard types
-    GameState ..> AIMove : uses
-    UltimateBoard ..> AIMove : uses
+    GameState ..> AIMove : passes/receives
+    UltimateBoard ..> AIMove : passes/receives
