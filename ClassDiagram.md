@@ -46,7 +46,7 @@ classDiagram
         +AIMove bestMove
         +bool wasMaximizing
     }
-    MinimaxStrategy +-- TTEntry
+    MinimaxStrategy ..> TTEntry : contains
     TTEntry --> TTFlag : uses
 
     %% --- EVALUATION ENGINE ---
@@ -128,8 +128,8 @@ classDiagram
         +int metaNearWin
         +int metaOpponentNearWin
     }
-    FeatureEvaluator +-- Features
-    FeatureEvaluator +-- Weights
+    FeatureEvaluator ..> Features : contains
+    FeatureEvaluator ..> Weights : contains
 
     %% --- HIGH LEVEL ARCHITECTURE ---
     class ArenaHost {
@@ -282,4 +282,3 @@ classDiagram
     %% Relationships highlighting interactions with standard types
     GameState ..> AIMove : uses
     UltimateBoard ..> AIMove : uses
-    ```
