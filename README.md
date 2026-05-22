@@ -2,6 +2,21 @@
 
 AI implementation for Ultimate Tic Tac Toe featuring advanced search algorithms and modular evaluation systems.
 
+## Documentation
+
+### Global Architecture (UML)
+To visualize class organization, ownership hierarchies, and core AI components (interfaces, internal structures, search dependencies), refer to the [Mermaid Class Diagram](#ClassDiagram.md) at the beginning of this document.
+
+### Automatic Generation via DoxyBlocks
+The source code is documented natively in the header files (`.h`) following the Doxygen standard format. 
+
+To generate and view the interactive HTML documentation or PDF manual:
+
+1. **Prerequisites:** Install Doxygen on your system and ensure the DoxyBlocks plugin is enabled in Code::Blocks.
+2. **Configuration:** Navigate to Plugins -> DoxyBlocks -> Preferences to configure output formats (HTML and/or LaTeX) and directory target paths.
+3. **Extraction:** Click Plugins -> DoxyBlocks -> Extract documentation (or use the DoxyBlocks shortcut icon in the toolbar).
+4. **Viewing:** Once generation completes, click Open documentation to launch the interactive index (`index.html`) inside your web browser.
+
 ## Project Structure
 
 ```text
