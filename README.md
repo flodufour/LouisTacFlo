@@ -1,6 +1,6 @@
 # Ultimate Tic Tac Toe AI
 
-AI implementation for Ultimate Tic Tac Toe featuring advanced search algorithms and modular evaluation systems.
+AI implementation for Ultimate Tic Tac Toe featuring advanced search algorithm and modular evaluation system.
 
 ## Documentation
 
