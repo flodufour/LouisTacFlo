@@ -108,7 +108,7 @@ public:
 
 ### Minimax Strategy
 
-The primary competitive engine uses an optimized Minimax search architecture designed to deeply explore variations while minimizing computational waste:
+The e engine uses an optimized Minimax search architecture designed to deeply explore variations while minimizing computational waste:
 
 * **Alpha-Beta Pruning**
     * **Mechanism:** Maintains two values throughout the recursive search: `alpha` (the minimum score the maximizing player is assured of) and `beta` (the maximum score the minimizing player is assured of). 
