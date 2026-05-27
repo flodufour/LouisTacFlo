@@ -21,7 +21,7 @@ AIMove MinimaxStrategy::chooseMove(GameState& state) {
     int remainingMoves = state.getMovesLeft();
     int effectiveMaxDepth = std::min(_maxDepth, remainingMoves);
 
-    for (int d = 1; d <= effectiveMaxDepth && (std::chrono::high_resolution_clock::now() - start) < std::chrono::milliseconds(100); ++d) {
+    for (int d = 1; d <= effectiveMaxDepth && (std::chrono::high_resolution_clock::now() - start) < std::chrono::milliseconds(2); ++d) {
         std::cout << "Current depth : " << d << std::endl;
         int alpha = -9999999;
         int beta  =  9999999;
@@ -137,18 +137,18 @@ int MinimaxStrategy::minimax(GameState& state, int depth, bool maximizing, int a
     }
 
 
-if (entry.key != hash && depth < entry.depth) {
-} else {
-    entry.key = hash;
-    entry.value = best;
-    entry.depth = depth;
-    entry.bestMove = bestMoveLocal;
-    entry.wasMaximizing = maximizing;
+    if (entry.key != hash && depth < entry.depth) {
+    } else {
+        entry.key = hash;
+        entry.value = best;
+        entry.depth = depth;
+        entry.bestMove = bestMoveLocal;
+        entry.wasMaximizing = maximizing;
 
-    if (best <= alphaOrig) entry.flag = TTFlag::UPPER_BOUND;
-    else if (best >= beta) entry.flag = TTFlag::LOWER_BOUND;
-    else entry.flag = TTFlag::EXACT;
-}
+        if (best <= alphaOrig) entry.flag = TTFlag::UPPER_BOUND;
+        else if (best >= beta) entry.flag = TTFlag::LOWER_BOUND;
+        else entry.flag = TTFlag::EXACT;
+    }
 
     return best;
 }
